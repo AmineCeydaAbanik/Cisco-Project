@@ -1,0 +1,206 @@
+TTL = time to live
+ping atarak cihaz hakkinda bilgi ediniyoruz. TTL degeri her hup(router(layer 3 cihaz)) geçtiginde 1 azalir. Ayni networkteseler TTL degeri sabit kalicaktir.
+
+windows TTL = 128
+linux TTL = 64
+cisco TTL = 255
+
+
+
+collision domain:***
+	Layer2 cihazlarin her bacagi bir co llasion domaindir. Layer3 cihazlarin her bir bacagi bir collasion domaindir. 
+broadcast domain:***
+	Layer3 cihazlarin herbir bacagi broadcast domaindir. **Yapimizda hub gibi layer1 cihazlar var ise layer1 cihazlar ortami collision yada broadcast domainlere ayiramazlar.
+
+	
+
+10.0.0.0 --- 255.0.0.0 --- /8
+10.0.0.0/16 --- 255.255.0.0 ----/16
+10.0.0.0/24 ---- 255.255.255.0 ---/24 
+
+172.16.0.0 ---- 255.255.0.0 /16
+
+192.168.1.0 ---- 255.255.255.0 /24
+ 
+
+
+----router rip version 2
+
+classless networklari haberlesmede kullanilir. 30 saniyede bir bütün routerlar roting tebllarini digr ruterlara gönderirler. Rouerlerlar kendi aralarinda 224.0.0.10 multicast IPsi üzerinden haberlesirler. 
+
+
+
+----Backbone area
+
+
+----DHCP----
+
+DORA 
+discovery
+offer
+request
+acknowledge
+
+
+
+-----VLAN----
+
+Esneklik: Herhangi bir bilgisayari, herhangi bir sw'in hergangi bir portuna baglayip o portuda 
+bilgisayarin olmasi gerektigini networka atayabiliriz.
+
+Switchi segmentlere ayirir. Bu sayede sw üzerinde broadcasht domain olusmasini saglar.
+
+Güvenlik: Kötü niyetli bir kisi sadece bilgisayarini bagladigi vlana saldirabilir.
+
+
+
+---------VTP---------
+
+Mode
+Server
+Client
+Transparent
+
+VTP Server: Vlan craft edebilir modifiye edebilir delete edebilir üzerindeki vlanlari diger swicthlere 
+anons edebilir. Diger swicthlerden gelen vlanlari kendi üzerine ekleyip diger swicthlere anons edebilir.
+
+Client: Serverdan gelen vlanlari üzerine yazabilir. Ve anons edebilir. Herhangi bir vlan olusturamaz.
+Modfiye edemez ve delete edemez. 
+
+Transparent : Baska switchlerden gelen vlanlari baska switchlere anons edebilir.Üzerine almaz. Sadece kendi 
+üzerinde vlan yaratir. Kendi üzerinde yarattigi vlanlar baska swicthlere anons edilmez. Localda saklanir.
+Genelde DMZ ortamlarinda kullanilir. 
+
+
+
+-------STP--------
+En düsük bridge IDye sahip olan root oluyor.
+Rootun portlari designated ve forward
+Root switch'e bakan portlar root ve forward durumunda
+Block porta bakan bacak designated ve forward durumunda.
+Block olan port block ve alternatif 
+
+Alternatif ve blok 
+Blocking ----20sn
+Listening ---15sn
+Learning ----15sn
+Forwarding
+
+---3lü STD----
+Hangisi root? Iki bacagida FW(yesil) + ona bakan iki bacakta FW(yesil) olan
+
+
+
+-----Port Secrtury----
+
+Vision mod shutdown secilirse portu tamamen kapatir. Yapilan ihlal geri alinsa bile port kapali kalmaya devam eder.
+Portu açmak için interface içine girip shutdown komutu yazilir ardindan no shutdwon yapilir. Port tekrar açilir.
+
+Protect ve restrict ihlallerindeyapi lan ihlal geri alindiginda port çalismaya devam  eder. Aradaki fark restrict modda ihlal 
+gerçeklesirse log üretir. Protect modda ise ihlal gerçeklestigi zaman log üretmez.
+
+
+----Etherchannel Gereklilikleri----
+
+Hiz ve Dupleks 
+Mode
+Vlan
+Trunk özellikleri 
+
+
+
+----Access List----
+
+Standard acces listler destinationa yakin yazilir.
+extended acces listler 
+ 
+Standard --- 1-99 ve 1300-1999
+Extended --- 100-999 ve 2000-2699
+
+-------------------------------------
+
+NAT(Network Address Translations)
+
+Private : Internete çikamiyor. 
+          10.0.0.0  - 10.255.255.255
+          172.16.0.0 - 172.31.255.255
+          192.168.0.0 - 192.168.255.255
+
+Public :  
+
+statik nat (tek iç ip tek dis ipye natlanir)
+ip nat inside source static 192.168.1.1 85.111.3.1
+
+Router#sh ip nat translations 
+
+ip nat inside source list 1 int g 0/0 overload 
+
+
+----router yedekleme
+Yedekleri alma
+Router#copy flash: tftp: 
+Source filename []? c2900-universalk9-mz.SPA.151-4.M4.bin
+Address or name of remote host []? 192.168.1.1
+
+Router#copy running-config tftp: 
+Router#copy startup-config tftp:
+
+----IOS SILME YENIDEN YÜKLEME
+ 
+Router#delete flash: 
+Delete filename []?c2900-universalk9-mz.SPA.151-4.M4.bin
+reload
+
+ tftpdnld	
+ IP_ADDRESS=192.168.1.12
+ IP_SUBNET_MASK=255.255.255.0
+ DEFAULT_GATEWAY=192.168.1.12
+ TFTP_SERVER=192.168.1.1
+ TFTP_FILE=c2900-universalk9-mz.SPA.151-4.M4.bin
+ tftpdnld
+  reset
+
+
+
+----Konsol sifre resetleme
+
+-router sifreleme
+r1(config)#line console 0
+r1(config-line)#password console
+r1(config-line)#login local
+r1(config-line)#exit
+
+r1(config)#enable password 123
+
+r1(config)#enable secret 1234
+
+r1(config)#line vty 0 4
+r1(config-line)#password telnet
+r1(config-line)#login
+
+r1(config)#service password-encryption  ---tüm sifreleri sifreler
+
+-sifre kirma
+
+Rommon moda düsmek için fiziksel olarak router kapa aç yaparken ctrl+v+break
+
+rommon 1 > confreg 0x2142
+rommon 2 > reset
+
+Router#copy startup-config running-config 
+
+do sh run ile sifreler nerede görülür
+
+r1(config)#line console 0
+r1(config-line)#no password 
+r1(config-line)#login
+
+r1(config)# no enable password 
+r1(config)#no enable secret
+r1(config)#line vty 0 4
+r1(config-line)#no password 
+
+sifreler kaldirildi 
+
+r1(config)#config-register 0x2102
+r1(config)#do reload 
